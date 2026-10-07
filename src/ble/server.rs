@@ -4,10 +4,7 @@ use microbit_bsp::ble::{MultiprotocolServiceLayer, SoftdeviceController, Softdev
 use static_cell::StaticCell;
 use trouble_host::prelude::*;
 
-use crate::{
-    ble::{BLE_NAME, BleController, BleResources, ble_task, mpsl_task},
-    btn::ButtonService,
-};
+use crate::ble::{BLE_NAME, BleController, BleResources, ble_task, gatt::ButtonService, mpsl_task};
 
 #[gatt_server]
 pub struct BleServer {
@@ -48,7 +45,7 @@ impl<'d> BleServer<'d> {
             SERVER.init(
                 BleServer::new_with_config(GapConfig::Peripheral(PeripheralConfig {
                     name: BLE_NAME,
-                    appearance: &appearance::human_interface_device::GAMEPAD,
+                    appearance: &appearance::human_interface_device::KEYBOARD,
                 }))
                 .expect("Error creating Gatt Server"),
             )

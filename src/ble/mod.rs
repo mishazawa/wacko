@@ -1,7 +1,8 @@
 use microbit_bsp::ble::{MultiprotocolServiceLayer, SoftdeviceController};
-use trouble_host::prelude::*;
+use trouble_host::prelude::{service_class::HID, *};
 
 mod gap;
+mod gatt;
 mod server;
 
 pub use gap::advertise;
@@ -24,6 +25,9 @@ It still handles connection parameter updates, security procedures like pairing,
 and configuration down at the link layer.
 
 */
+
+pub const MSP_NORDIC_COMPANY_ID: u16 = 0x0059;
+pub const MSP_PAYLOAD: [u8; 4] = [0x01, 0x02, 0x03, 0x04];
 
 const BLE_NAME: &str = "misha_";
 
