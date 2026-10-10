@@ -20,23 +20,33 @@ embassy-executor = { version = "0.9", default-features = false, features = [
 
 embassy-futures = "0.1.2"
 embassy-sync = { version = "0.8", features = ["defmt"] }
-embassy-nrf = { version = "0.11.0", features = ["defmt", "gpiote", "nrf52833"] }
+embassy-time = { version = "0.5.1", features = [
+    "defmt",
+    "defmt-timestamp-uptime",
+] }
+embassy-nrf = { version = "0.11.0", features = [
+    "defmt",
+    "gpiote",
+    "nrf52833",
+    "time-driver-rtc1",
+] }
 
-microbit-bsp = { git = "https://github.com/lulf/microbit-bsp.git" }
+
+nrf-softdevice = { version = "0.1.0", features = [
+    "defmt",
+    "ble-peripheral",
+    "ble-central",
+    "critical-section-impl",
+    "nrf52833",
+    "s140",
+    "ble-l2cap",
+    "ble-gatt-server",
+    "ble-gatt-client",
+    "ble-sec",
+] }
+nrf-softdevice-s140 = "0.1.2"
 
 panic-probe = "1.0.0"
 static_cell = "2.1.1"
-
-trouble-host = { version = "0.8.0", features = ["defmt", "gatt", "peripheral"] }
-nrf-sdc = { version = "0.4.0", default-features = false, features = [
-    "defmt",
-    "peripheral",
-    "nrf52833",
-] }
-nrf-mpsl = { version = "0.4.0", features = [
-    "defmt",
-    "critical-section-impl",
-    "nrf52833",
-] }
 
 [patch.crates-io]
