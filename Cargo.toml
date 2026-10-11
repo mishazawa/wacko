@@ -31,3 +31,10 @@ microbit-bsp = { git = "https://github.com/lulf/microbit-bsp.git", features = [
 ] }
 
 [patch.crates-io]
+
+[[bin]]
+name = "wacko"
+path = "src/main.rs"
+test = false
+doctest = false
+bench = false
