@@ -6,7 +6,6 @@ use nrf_softdevice::{
         gatt_server::{self, CharacteristicHandles, RegisterError, builder::ServiceBuilder},
         security::SecurityHandler,
     },
-    raw,
 };
 
 use crate::ble::constants::*;

@@ -1,23 +1,33 @@
+use defmt::info;
+use embassy_executor::Spawner;
 use nrf_softdevice::{
     Softdevice,
-    ble::gatt_server::{self, RegisterError},
+    ble::{
+        Connection,
+        gatt_server::{self, RegisterError},
+        peripheral::AdvertiseError,
+    },
 };
 
 use crate::ble::{
     SERIAL_NUMBER,
+    gap::{advertise, init_sd},
     gatt::{
         BatteryService, DeviceInformation, DeviceInformationService, HidService, PnPID, VidSource,
     },
 };
 
 pub struct Server {
+    sd: &'static Softdevice,
     _dis: DeviceInformationService,
     bas: BatteryService,
     hid: HidService,
 }
 
 impl Server {
-    pub fn new(sd: &mut Softdevice) -> Result<Self, RegisterError> {
+    pub fn new(spawner: Spawner) -> Result<Self, RegisterError> {
+        let sd = init_sd()?;
+
         let dis = DeviceInformationService::new(
             sd,
             &PnPID {
@@ -35,14 +45,25 @@ impl Server {
         )?;
 
         let bas = BatteryService::new(sd)?;
-
         let hid = HidService::new(sd)?;
 
+        spawner.must_spawn(softdevice_task(sd));
+
         Ok(Self {
+            sd,
             _dis: dis,
             bas,
             hid,
         })
+    }
+
+    pub async fn advertise(&self) -> Result<Connection, AdvertiseError> {
+        advertise(self.sd).await
+    }
+
+    pub async fn on_connection(&self, conn: &Connection) {
+        let e = gatt_server::run(&conn, self, |_| {}).await;
+        info!("gatt_server run exited with error: {:?}", e);
     }
 }
 
@@ -61,4 +82,9 @@ impl gatt_server::Server for Server {
         self.bas.on_write(handle, data);
         None
     }
+}
+
+#[embassy_executor::task]
+async fn softdevice_task(sd: &'static Softdevice) -> ! {
+    sd.run().await
 }

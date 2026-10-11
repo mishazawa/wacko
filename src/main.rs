@@ -7,33 +7,23 @@ use panic_probe as _;
 
 use defmt::info;
 use embassy_executor::Spawner;
-use nrf_softdevice::{Softdevice, ble::gatt_server};
 
-use crate::ble::{advertise, init};
+use crate::ble::Server;
 
 mod ble;
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
     info!("Starting..");
-    let (sd, server) = init().expect("Failed to init BLE stack.");
 
-    spawner.must_spawn(softdevice_task(sd));
+    let server = Server::new(spawner).expect("Failed to init BLE stack.");
 
     loop {
         info!("Advertising..");
-        match advertise(sd).await {
-            Ok(conn) => {
-                let e = gatt_server::run(&conn, &server, |_| {}).await;
-                info!("gatt_server run exited with error: {:?}", e);
-            }
+        match server.advertise().await {
+            Ok(conn) => server.on_connection(&conn).await,
             Err(e) => {
-                info!("advertise run exited with error: {:?}", e);
+                info!("Advertising exited with error: {:?}", e);
             }
         };
     }
-}
-
-#[embassy_executor::task]
-async fn softdevice_task(sd: &'static Softdevice) -> ! {
-    sd.run().await
 }
