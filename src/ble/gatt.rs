@@ -3,7 +3,9 @@ use nrf_softdevice::{
     Softdevice,
     ble::{
         Connection, Uuid,
-        gatt_server::{self, CharacteristicHandles, RegisterError, builder::ServiceBuilder},
+        gatt_server::{
+            self, CharacteristicHandles, NotifyValueError, RegisterError, builder::ServiceBuilder,
+        },
         security::SecurityHandler,
     },
 };
@@ -22,7 +24,7 @@ pub struct HidService {
     report_map: u16,
     hid_control: u16,
     protocol_mode: u16,
-    input_keyboard: u16,
+    pub(crate) input_keyboard: u16,
     input_keyboard_cccd: u16,
     input_keyboard_descriptor: u16,
     output_keyboard: u16,
@@ -130,6 +132,15 @@ impl HidService {
             };
             gatt_server::notify_value(conn, self.input_keyboard, &res).unwrap();
         }
+    }
+
+    pub(crate) fn notify_button_state(
+        &self,
+        handle: u16,
+        conn: &nrf_softdevice::ble::Connection,
+        data: &[u8; 8],
+    ) -> Result<(), NotifyValueError> {
+        gatt_server::notify_value(conn, handle, data)
     }
 }
 

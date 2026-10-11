@@ -1,55 +1,64 @@
 use defmt::info;
-use microbit_bsp::{
-    Button,
-    embassy_time::{Duration, Timer},
-};
-use trouble_host::prelude::*;
+use embassy_nrf::gpio::Input;
 
-use crate::ble::BleServer;
+use embassy_time::{Duration, Timer};
+use nrf_softdevice::ble::Connection;
 
+use crate::ble::Server;
+
+pub type Button = Input<'static>;
 pub struct ShutterButton {
     pub name: char,
     pub input: Button,
-    pub ble_handle: Characteristic<[u8; 8]>,
+    pub ble_handle: u16,
 }
 
 impl ShutterButton {
-    pub fn new(input: Button, server: &BleServer<'static>) -> Self {
+    pub fn new(input: Button, server: &Server) -> Self {
         Self {
             name: 'A',
             input,
-            ble_handle: server.hid_info.input_keyboard,
+            ble_handle: server.hid.input_keyboard,
         }
     }
 
-    async fn notify_button_state(
-        &mut self,
-        conn: &GattConnection<'_, '_, DefaultPacketPool>,
-    ) -> Result<(), BleHostError<Error>> {
+    async fn notify_button_state(&mut self, server: &Server, conn: &Connection) {
         let debounce = Duration::from_millis(50);
         info!("button {} service online", self.name);
 
         loop {
             self.input.wait_for_low().await;
             info!("button {} pressed", self.name);
+            self.send_btn_debounce(0x90, server, conn, &debounce).await;
 
-            self.ble_handle
-                .notify(&conn, &KeyboardReport::new(0x90).to_bytes(), true)
-                .await?;
-            Timer::after(debounce).await;
             self.input.wait_for_high().await;
-            self.ble_handle
-                .notify(&conn, &KeyboardReport::new(0x00).to_bytes(), true)
-                .await?;
             info!("button {} depressed", self.name);
-            Timer::after(debounce).await;
+            self.send_btn_debounce(0x0, server, conn, &debounce).await;
         }
     }
 
-    pub async fn task(&mut self, conn: &GattConnection<'_, '_, DefaultPacketPool>) {
+    async fn send_btn_debounce(
+        &self,
+        value: u8,
+        server: &Server,
+        conn: &Connection,
+        debounce: &Duration,
+    ) {
+        server
+            .hid
+            .notify_button_state(
+                self.ble_handle,
+                &conn,
+                &KeyboardReport::new(value).to_bytes(),
+            )
+            .expect("Failed to sent button state");
+        Timer::after(*debounce).await;
+    }
+
+    pub async fn task(&mut self, server: &Server, conn: &Connection) {
         // task for single button
         // never returns
-        let _ = self.notify_button_state(conn).await;
+        let _ = self.notify_button_state(server, conn).await;
     }
 }
 

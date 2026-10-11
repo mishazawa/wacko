@@ -21,7 +21,7 @@ pub struct Server {
     sd: &'static Softdevice,
     _dis: DeviceInformationService,
     bas: BatteryService,
-    hid: HidService,
+    pub(crate) hid: HidService,
 }
 
 impl Server {
