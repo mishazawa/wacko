@@ -1,15 +1,17 @@
 #![no_std]
 #![no_main]
 
-use crate::btn::ShutterButton;
-
-use {defmt_rtt as _, panic_probe as _};
+use defmt_rtt as _;
+use panic_probe as _;
 
 use microbit_bsp::*;
 
 use embassy_executor::Spawner;
 
+mod ble;
 mod btn;
+
+use crate::btn::ShutterButton;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
