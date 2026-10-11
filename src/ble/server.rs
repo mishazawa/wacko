@@ -57,6 +57,8 @@ impl gatt_server::Server for Server {
         offset: usize,
         data: &[u8],
     ) -> Option<Self::Event> {
-        todo!()
+        self.hid.on_write(conn, handle, data);
+        self.bas.on_write(handle, data);
+        None
     }
 }

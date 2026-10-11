@@ -20,10 +20,7 @@ embassy-executor = { version = "0.9", default-features = false, features = [
 
 embassy-futures = "0.1.2"
 embassy-sync = { version = "0.8", features = ["defmt"] }
-embassy-time = { version = "0.5.1", features = [
-    "defmt",
-    "defmt-timestamp-uptime",
-] }
+embassy-time = { version = "0.5.1", features = ["defmt"] }
 embassy-nrf = { version = "0.11.0", features = [
     "defmt",
     "gpiote",

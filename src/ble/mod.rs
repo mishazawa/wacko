@@ -1,5 +1,6 @@
 use core::mem;
 
+use defmt::info;
 use nrf_softdevice::{Softdevice, ble::gatt_server::RegisterError, raw};
 
 use crate::ble::server::Server;

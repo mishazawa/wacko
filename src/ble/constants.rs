@@ -60,10 +60,10 @@ pub const STRING_MINIMUM: u8 = 0x88;
 pub const STRING_MAXIMUM: u8 = 0x98;
 pub const DELIMITER: u8 = 0xa8;
 
-const KEYBOARD_ID: u8 = 0x01;
-const MEDIA_KEYS_ID: u8 = 0x02;
+pub const KEYBOARD_ID: u8 = 0x01;
+pub const MEDIA_KEYS_ID: u8 = 0x02;
 
-const HID_REPORT_DESCRIPTOR: &[u8] = hid!(
+pub const HID_REPORT_DESCRIPTOR: &[u8] = hid!(
     (USAGE_PAGE, 0x01), // USAGE_PAGE (Generic Desktop Ctrls)
     (USAGE, 0x06),      // USAGE (Keyboard)
     (COLLECTION, 0x01), // COLLECTION (Application)

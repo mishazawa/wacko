@@ -14,11 +14,13 @@ use crate::ble::{advertise, init};
 mod ble;
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
-    info!("Staring..");
-    let (sd, server) = init().expect("Can't init BLE");
+    info!("Starting..");
+    let (sd, server) = init().expect("Failed to init BLE stack.");
 
     spawner.must_spawn(softdevice_task(sd));
+
     loop {
+        info!("Advertising..");
         match advertise(sd).await {
             Ok(conn) => {
                 let e = gatt_server::run(&conn, &server, |_| {}).await;
