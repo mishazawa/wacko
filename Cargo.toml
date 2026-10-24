@@ -25,9 +25,19 @@ embassy-time = { version = "0.5.1", features = ["defmt"] }
 panic-probe = "1.0.0"
 static_cell = "2.1.1"
 
-microbit-bsp = { git = "https://github.com/lulf/microbit-bsp.git", features = [
+heapless = { version = "0.9.3", features = ["defmt"] }
+
+microbit-bsp = { path = "./deps/microbit-bsp", features = ["defmt", "trouble"] }
+# trouble-host = { version = "0.8", features = ["defmt", "security"] }
+trouble-host = { git = "https://github.com/embassy-rs/trouble", features = [
     "defmt",
-    "trouble",
+    "security",
+    "legacy-pairing",
+] }
+
+embassy-crypto = { git = "https://github.com/embassy-rs/embassy" }
+embassy-crypto-rustcrypto = { git = "https://github.com/embassy-rs/embassy", features = [
+    "all",
 ] }
 
 [patch.crates-io]

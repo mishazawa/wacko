@@ -1,0 +1,3 @@
+[submodule "deps/microbit-bsp"]
+	path = deps/microbit-bsp
+	url = git@github.com:mishazawa/microbit-bsp.git
